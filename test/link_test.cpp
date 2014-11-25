@@ -1,5 +1,6 @@
 #include <cstdio>
-#include "../ads/link.h"
+#include "../link_algo.h"
+//#include "../alloc_algo.h"
 
 struct STest {
 	int val;
@@ -12,7 +13,7 @@ struct DTest {
 };
 
 int main() {
-#if 0
+#if 1
 	SList<STest> s;
 	STest st[7];
 	st[0].val = 0;
@@ -29,7 +30,6 @@ int main() {
 	s.push(&st[4]);
 	s.push(&st[5]);
 	s.push(&st[6]);
-	printf("\n");
 	int n = s.size();
 	for(int i=0;i<=3;i++) {
 		printf("top:%d,contains:%d:%d\n",s.top()->val,i,s.contain(&st[i]));
@@ -43,8 +43,35 @@ int main() {
 	n = s.size();
 	printf("contain 2:%d,size:%d\n",s.contain(&st[2]),n);
 	printf("top:%d\n",s.top()->val);
+	s.pop();
+	printf("contain 1:%d,size:%d\n",s.contain(&st[1]),s.size());
 
-#elif 1
+	s.push(&st[0]);
+	s.push(&st[1]);
+	s.push(&st[2]);
+	s.push(&st[3]);
+	s.push(&st[4]);
+	s.push(&st[5]);
+	s.push(&st[6]);
+
+	s.reverse();
+	n = s.size();
+	for(int i=0;i<=n/2;i++) {
+		printf("top:%d ",s.top()->val);
+		s.pop();
+	}
+	printf("\n");
+	
+	s.reverse();
+	n = s.size();
+	printf("%d\n",n);
+	for(int i=0;i<n;i++) {
+		printf("top:%d ",s.top()->val);
+		s.pop();
+	}
+	printf("\n");
+
+#elif 0
 
 	DList<DTest> d;
 	DTest dt[6];

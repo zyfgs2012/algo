@@ -1,5 +1,5 @@
-#ifndef LINK_H
-#define LINK_H
+#ifndef LINK_ALGO_H
+#define LINK_ALGO_H
 
 /**invasive slink and dlink :has a dummy header*/
 typedef struct __SLINK{
@@ -55,9 +55,9 @@ typedef struct __DLINK{
 
 
 /*
- * template SLINK
+ * template SList
  * T must contain SLINK link
-*/
+ */
 template <typename T>
 class SList {
 	protected:
@@ -115,12 +115,35 @@ class SList {
 			}
 			return false;
 		}
-		
+
+		void reverse() {
+			if(1 >= m_count) return;
+			SLINK *p, *c, *n;
+			p = m_head.next;
+			c = p->next;
+			n = c->next;
+			int temp = m_count;
+			while(temp > 2) {
+				c->next = p;
+				p = c;
+				c = n;
+				n = n->next;
+				temp--;
+			}
+			c->next = p;
+			m_head.next = c;
+		}
+
 		int size() {
 			return m_count;
 		}
 };
 
+
+/*
+ * template DList
+ * T must contain DLINK link
+ */
 template <typename T>
 class DList {
 	protected:
