@@ -4,10 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdio.h>
 
 class malloc_allocator {
 	public:
 		static void* allocate(size_t n) {
+			printf("malloc allocator:%d\n",n); //debug
 			void* res = malloc(n);
 			if(NULL == res) {
 				printf("Error: Out Of Memory\n");
@@ -90,7 +92,7 @@ class default_allocator {
 					new_size > static_cast<size_t>(MAX_SIZE)) {
 				return malloc_allocator::reallocate(p,new_size);
 			}
-			if(round_up(old_size = new_size)) return p;
+			if(round_up(old_size) == round_up(new_size)) return p;
 			void *ret = allocate(new_size);
 			size_t copy_size = old_size > new_size ? new_size : old_size;
 			memcpy(ret,p,copy_size);
@@ -104,6 +106,7 @@ size_t default_allocator::S_size = 0;
 char* default_allocator::S_free_list[NFREELIST] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 void* default_allocator::re_build(size_t obj_size) {
+	printf("round up %d\n",obj_size); //debug
 	int obj_n = 20; //what's the approximate number?
 	char *begin = reinterpret_cast<char*>(do_alloc(obj_size,obj_n));
 	if(NULL == begin || 1 == obj_n) return begin;
@@ -119,7 +122,8 @@ void* default_allocator::re_build(size_t obj_size) {
 	}
 	set_next(curr,NULL);//last object set_next = NULL;
 	size_t index = free_list_index(obj_size);
-	set_next(S_free_list[index],begin + obj_size);
+	S_free_list[index] = begin + obj_size;
+	//set_next(S_free_list[index],begin + obj_size);
 	return begin;
 }
 
