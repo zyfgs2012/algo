@@ -1,5 +1,6 @@
 #ifndef HEAP_ALGO_H
 #define HEAP_ALGO_H
+#include "alloc_algo.h"
 template <typename T>
 class Heap {
 	protected:
@@ -9,13 +10,13 @@ class Heap {
 	public:
 		T* m_dp;
 		Heap(int size) {
-			m_phead = new T[size+1];
+			m_phead = reinterpret_cast<T*>(default_allocator::allocate(sizeof(T) * size));
 			m_dp = m_phead;
 			m_ncapacity = size;
 			m_count = 0;
 		}
 		~Heap() {
-			delete [] m_phead;
+			default_allocator::deallocate(m_phead,sizeof(T) * m_ncapacity);
 			m_phead = NULL;
 		}
 		int size() {
