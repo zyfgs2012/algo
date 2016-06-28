@@ -51,7 +51,7 @@ Essentially, an item recommender system is used for generating a personalized ra
 \item We evaluate our approach on a real flight order dataset, and the result shows that our approach can effectively improve the recommendation accuracy.
 \end{enumerate}
 
-\textbf{Paper organization.} The rest of paper is structured as follows. We introduce related work in Section \ref{sec:relw}. In Section \ref{sec:mod}, we define the problem and describe the model. Besides, we also discuss how to do parameter inference. In section \ref{sec:exp}, we introduce the experiment dataset, evaluation metrics and the experimental results of passenger prediction and flight recommendation. Finally, we conclude the paper in section \ref{sec:con}.
+\textbf{Paper organization.} The rest of paper is structured as follows. We introduce related work in Section \ref{sec:relw}. In Section \ref{sec:mod}, we define the problem and describe the model. Besides, we also discuss how to do parameter inference. In section \ref{sec:rec}, we propose a preference-based flight ticket recommendation approach, which also plays a role as a baseline method at evaluation stage. In section \ref{sec:exp}, we introduce the experiment dataset, evaluation metrics and the experimental results of passenger prediction and flight recommendation. Finally, we conclude the paper in section \ref{sec:con}.
 
 \section{Related Work}\par
 \label{sec:relw}
@@ -225,42 +225,19 @@ Topic-word parameter $\Phi$
 \end{algorithmic} 
 \end{algorithm}
 
+\section{The Preference-based recommendation approach}
+\label{sec:rec}
+Since there is little existing work aimed at flight ticket recommendation. In this section, we propose a user preference-based recommendation approach. In section \ref{sec:exp}, we will evaluate this method as well as some business ranking strategies, such as price rank etc, to demonstrate that this method has a better accuracy. Then, we will apply the passenger prediction results to improve recommendation accuracy further on.
 
-\section{Experiments}
-\label{sec:exp}
-In the following subsections, we introduce datasets, preference-based recommendation method and evaluation metrics. Then we evaluate the performance of user prediction and passenger prediction based recommendation respectively.
-\subsection{Dataset and preference-based recommendation method}
-In our experiments, we use a real flight ticket dataset, consisting of all submitted orders for two years. An order contains account id and all passengers' id. We use desensitized passenger id to distinguish individuals from each other. Besides, an order contains some travel information that can be considered as decisive factors, such as departure airport, arrival airport, order submitted time, takeoff time, etc. In our experiment, we select active users whose amount of history orders reaches a threshold, thus user's preference can be extracted with more confidence. In addition, many researches\cite{amy:guess}\cite{yutaka:modeling} on shared account recommendation generate an artificial dataset by composing single accounts' data. We also generate an artificial dataset combining single passengers from different accounts. We extract two passengers from arbitrary accounts and combine them as one account. Overviews of two datasets and the meta data of orders are summarized in table \ref{tab:dat} and table \ref{tab:mdat}.
-\begin{table}[!htbp]
-\centering
-\caption{\label{tab:dat}Datasets}
-\begin{tabular}{|c|c|c|c|} \hline
-& \# accounts & \# passengers & \# orders\\ \hline
-Real & 4632&7034&38907 \\ \hline
-Artificial &1604&3208&29759\\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[!htbp]
-\centering
-\caption{\label{tab:mdat}Meta data}
-\begin{tabular}{|c|c|} \hline
-Travel Info & \tabincell{c}{airline, departure city, arrival city, \\departure airport, arrival airport, \\takeoff time, arrival time}\\ \hline
-Content Info & \tabincell{c}{order time, login ip, geo location,\\ other trace log information}\\ \hline
-Individual Info & account-id, passenger-id, age, gender\\ \hline
-Order Info & \tabincell{c}{flight number, price , craft type, \\class, rescheduling/canceling policy}\\ \hline
-\end{tabular}
-\end{table}
-
-The meta data of an order includes travel information, context information, individual information and order information. Travel information contains the departure and arrival city, takeoff time. Context information contains time of browsing, searching and filtering actions. Individual information contains account id, personal information. Order information consists of price, seat class, flight number, airline company  et al.\par
-
-With factors mentioned above, we propose a user preference based recommendation method. First, select decisive factors and partition each factor's possible values to different levels, thus we can represent a candidate flight ticket as a vector. Then extract a user's preference from his historical orders, for every factor, we generate a vector representing all alternatives and assign each dimension with the percentage of occurrence frequency. For every item in candidate ticket list, we compare it with users' preference model and get a score for every factor based on the frequency percentage. We can sum up score of every factor to get a total score for item, and rank all candidates in the list according to the total score. We can then provide a top-$N$ recommendation.\par
-
-In addition, different users may cares different factors, thus we introduce a weight vector for every account. The evaluation of this weight vector contains two steps, initializing and training, respectively. At the initializing step, we estimate how much a user focuses on a factor through the information entropy, as mentioned in \cite{yang:pers}. We believe that if a user focuses on a factor, his behavior will be less random. The entropy $H$ is a measure to describe the uncertainty for discrete random variable $X$ and probability mass function $P(X)$. Here is the mathematical representation for entropy.\\
+\subsection{Factor selection and frequency statistic}
+A flight ticket clearly contains a set of factors, such as price, takeoff time, craft size, etc. Thus some decisive factors should be chosen. Besides, these factors may be either discrete or continuous. We divide a continuous factor into a vector of intervals, so any factor can be represented as a vector of finite alternatives. Then, we analyze user's submitted orders by counting the frequency of all alternatives for each factor. In a word, a user's preference model can be described as a union of vectors, a vector indicates one factor and an element within one vector represents the frequency of corresponding alternative which the user has chosen.\par
+We can also represent a candidate flight ticket as a vector, where each element is the corresponding alternative of each factor. So, for every ticket in candidate list, we compare the vector with users' preference model and get a score for every factor based on the frequency. We can sum up score of every factor to get a total score for that item, and rank all candidates according to the total score. We can then generate a top-$N$ recommendation.\par
+\subsection{Weight of factors}
+Since users may care different factors, we introduce personalized weight vector for each user. The evaluation of this weight vector contains two steps, initializing and training. At the initializing step, we estimate how much a user focuses on a factor through the information entropy, as mentioned in \cite{yang:pers}. We believe that if a user focuses on a factor, his behavior will be more concentrated. The entropy $H$ is a measure to describe the uncertainty for discrete random variable $X$ and probability mass function $P(X)$. Here is the mathematical representation for entropy.\\
 \begin{equation}
 H(X)=E[-lnP(X)]= - \sum_{i-1}^n P(x_i)log_bP(X_i)
 \end{equation}\par
-The value $b$ is the base of logarithm, and is usually 2. The entropy of every factor can be calculated and initialized as the weight value after normalization. Considering that different factors have a variety quantity of alternatives and the user may concern different factors some time later, we update the weight vector once the user submits an order. For each submission, we have already produced a ranked list for recommendations, if the user doesn't choice an item (i.e, a ticket) from top-$N$ items, we consider this recommendation fails, so that the weight vector need be retrained to make the rank of selected item improved. The concept of weight training is mentioned in \cite{lor:flight}. By performing weight training for factors, we hope that the result of recommendation getting better in the future. The training procedure is quite straightforward. At first a learning rate should be set, such as $\alpha = 0.1$ . If the selected item has lower similarity for factor $f$ than items ranked before it, the weight value of this factor should be decreased. Otherwise, the weight value should be increased. To avoid the problem of over-fitting, we define a maximum number of iteration step. So the stop criteria is either $1)$ the rank of selected items can't be improved anymore or $2)$ the procedure reaches the iteration time limitation.\\
+The value $b$ is the base of logarithm, and is usually 2. The entropy of every factor can be calculated and initialized as the weight value after normalization. Considering that different factors have a variety quantity of alternatives and the user may concern different factors some time later, we update the weight vector once the user submits an order. For each submission, we have already produced a ranked list for recommendations, if the user doesn't choose an item (i.e, a ticket) from top-$N$ items, we consider this recommendation fails, so that the weight vector need be retrained to make the rank of selected item improved. The concept of weight training is mentioned in \cite{lor:flight}. By performing weight training for factors, we hope that the result of recommendation getting better in the future. The training procedure is quite straightforward. At first a learning rate should be set, such as $\alpha = 0.1$ . If the selected item has lower similarity for factor $f$ than items ranked before it, the weight value of this factor should be decreased. Otherwise, the weight value should be increased. To avoid the problem of over-fitting, we define a maximum number of iteration step. So the stop criteria is either $1)$ the rank of selected items can't be improved anymore or $2)$ the procedure reaches the iteration time limitation.\\
 The preference based recommendation algorithm is described as Algorithm \ref{alg:3}. First extracting a user's preference  $P$ and initializing weighted list $W$ through entropy. Items in candidate list are ranked based on inner product of $W$ and corresponding value of factor. After every recommendation, the list is retrained and stored depending on the item that user actually chosen.
 
 \begin{algorithm}[htb]
@@ -363,6 +340,34 @@ User actually chose candidate $c$
 \end{algorithmic} 
 \end{algorithm}
 
+
+\section{Experiments}
+\label{sec:exp}
+In the following subsections, we introduce datasets and evaluation metrics. Then we evaluate the performance of user prediction and passenger prediction based recommendation respectively.
+\subsection{Dataset}
+In our experiments, we use a real flight ticket dataset, consisting of all submitted orders for two years. An order contains account id and all passengers' id. We use desensitized passenger id to distinguish individuals from each other. Besides, an order contains some travel information that can be considered as decisive factors, such as departure airport, arrival airport, takeoff time, etc. In our experiment, we select active users whose amount of history orders reaches a threshold, thus user's preference can be extracted with more confidence. In addition, many researches\cite{amy:guess}\cite{yutaka:modeling} on shared account recommendation generate an artificial dataset by composing single accounts' data. We also generate an artificial dataset combining single passengers from different accounts. We extract two passengers from arbitrary accounts and combine them as one account. Overviews of two datasets and the meta data of orders are summarized in table \ref{tab:dat} and table \ref{tab:mdat}.
+\begin{table}[!htbp]
+\centering
+\caption{\label{tab:dat}Datasets}
+\begin{tabular}{|c|c|c|c|} \hline
+& \# accounts & \# passengers & \# orders\\ \hline
+Real & 4632&7034&38907 \\ \hline
+Artificial &1604&3208&29759\\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{\label{tab:mdat}Meta data}
+\begin{tabular}{|c|c|} \hline
+Travel Info & \tabincell{c}{airline, departure city, arrival city, \\departure airport, arrival airport, \\takeoff time, arrival time}\\ \hline
+Content Info & \tabincell{c}{order time, login ip, geo location,\\ other trace log information}\\ \hline
+Individual Info & account-id, passenger-id, age, gender\\ \hline
+Order Info & \tabincell{c}{flight number, price , craft type, \\class, rescheduling/canceling policy}\\ \hline
+\end{tabular}
+\end{table}
+
+The meta data of an order includes travel information, context information, individual information and order information. Travel information contains the departure and arrival city, takeoff time. Context information contains time of browsing, searching and filtering actions. Individual information contains account id, personal information. Order information consists of price, seat class, flight number, airline company  et al.\par
 
 \subsection{Settings and Evaluation Metrics}
 Essentially, flight ticket recommendation is an approach to select the best matched ticket by measuring the similarities between candidate tickets and user's preferences. We take the latest order of a user as the test data and the rest ones as the training data. The test data also plays a role of providing contextual knowledge for user prediction.\par
