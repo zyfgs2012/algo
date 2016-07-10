@@ -33,18 +33,13 @@ Personalized recommendation is needed for online flight booking service because 
 
 \section{Introduction}
 \label{sec:intro}
-Recent years, with the rapid development of online travel agencies, there are more and more passengers booking flights through online travel service providers. Typically, an user may input his departure city , arrival city  and departure time, then he will get a list of candidate flights. In general, there are dozens of flights within a list .  Figure \ref{fig:res} shows a list for all candidate flights  from Beijing to Hong Kong when input a query. There are total 156 matchable flights and the website only provides simple sorting strategies such as departure time, arrival time or price. Thus, it may take quite a long time for users to find the appropriate one. Therefore, a recommender system is  necessary for better user experiences.
-\begin{figure}[!hbt]
-\centering
-\includegraphics[scale=.48]{flight_tickets.eps}
-\caption{Search result for flight tickets}
-\label{fig:res}
-\end{figure}\par
-Essentially, a recommender system is used for generating a personalized ranking on a set of items\cite{lv:rec}. Typical recommender systems assume that the preference model of an individual can be learned from each account. However, for online flight booking, it is quite common that a user books flights for his family members, friends or colleagues.  Obviously, every passenger has his own preferences, which should be considered in flight recommendation. Unfortunately, before placing the order, people will not provider passengers' information.  Therefore, if we want to improve the accuracy of recommendation, we have to predict who are going to fly.  \par
- To predict who is using the account to place orders is regarded as the shared account problem. Some approaches have been proposed to extract implicit user information within an account. For example,  in \cite{kabbur:nlmf}\cite{jason:embedding} the nonlinear latent factorization is applied to  extract user information. However, these methods only rely on the analysis of relationships between products and users \cite{koen:top-n}\cite{yutaka:modeling}, and context information (such as time information, the query input) that can help differentiate users is neglected. Besides, current methods always assume an account represents a fixed number of implicit users, which are not always true in reality. Moreover, so far, the experiments have only been evaluated on artificial composite datasets. 
- The flight booking service providers can acquire passenger's personal information after he has submitted the order. Thus, our goal is to predict distributions of passengers in current session based on historical behaviors and contextual information so that we can make flight recommendations in a more precise way. To achieve this target, we adopt the probabilistic author-topic model to analyze passengers' behaviors. We regard all historical orders in an account as the corpus, all passengers appearing in the account as authors and orders together with context information as documents. Note that if an order has more than one passenger, they are regarded as co-authors of this document.\par
- In experiment section, we apply our method to a real flight order dataset.  And the result shows that our method has higher identification accuracy and a better recommendation accuracy.\par
- This paper has following contributions:\\
+Recent years, with the rapid development of online travel agencies, there are more and more passengers booking flights through online travel service providers. Typically, an user may input his departure city, arrival city and departure time, then he will get a list of candidate flights. In general, there are dozens of flights within a list. We perform a search for flights from Beijing to Hong Kong at a website, there are total 156 matchable flights. The website only provides simple sorting strategies such as departure time, arrival time or price. Thus, it may take quite a long time for users to find the appropriate one. Therefore, a recommender system is necessary for better user experiences.
+
+\par Essentially, a recommender system is used for generating a personalized ranking on a set of items\cite{lv:rec}. Typical recommender systems assume that the preference model of an individual can be learned from each account. However, for online flight booking, it is quite common that a user books flights for his family members, friends or colleagues.  Obviously, every passenger has his own preferences, which should be considered in flight recommendation. Unfortunately, before placing the order, people will not provider passengers' information.  Therefore, if we want to improve the accuracy of recommendation, we have to predict who are going to fly.  \par
+To predict who is using the account to place orders is regarded as the shared account problem. Some approaches have been proposed to extract implicit user information within an account. For example,  in \cite{kabbur:nlmf}\cite{jason:embedding} the nonlinear latent factorization is applied to  extract user information. However, these methods only rely on the analysis of relationships between products and users \cite{koen:top-n}\cite{yutaka:modeling}, and context information (such as time information, the query input) that can help differentiate users is neglected. Besides, current methods always assume an account represents a fixed number of implicit users, which are not always true in reality. Moreover, so far, the experiments have only been evaluated on artificial composite datasets. \par
+The flight booking service providers can acquire passenger's personal information after he has submitted the order. Thus, our goal is to predict distributions of passengers in current session based on historical behaviors and contextual information so that we can make flight recommendations in a more precise way. To achieve this target, we adopt the probabilistic author-topic model to analyze passengers' behaviors. We regard all historical orders in an account as the corpus, all passengers appearing in the account as authors and orders together with context information as documents.\par
+In experiment section, we apply our method to a real flight order dataset. And the result shows that our method has higher identification accuracy and a better recommendation accuracy.\par
+This paper has following contributions:\\
 \begin{enumerate}
 \item We provide a probabilistic passenger identification method for online flight booking service.
 \item We apply the passenger prediction results to flight recommendation.
@@ -55,18 +50,16 @@ Essentially, a recommender system is used for generating a personalized ranking 
 
 \section{Related Work}\par
 \label{sec:relw}
-\textbf{Content based Recommendation.} In online travel service industry such as airline tickets or hotel booking, the item (for example, an air ticket, a hotel booking order) information is usually highly structured, however, this information is quite mutable. Content-based recommender systems \cite{tech:cset}\cite{lops:handbook}are appropriate for highly structured items. The method needs proper representations of the attributes of items and the profile of user interests, then it tries to match  the profile of user's interests with attributes of items. In general, a content-based recommender system consists of three components. A content analyzer extracts structured attributes of items through a series of pre-processing steps and it produces the inputs for the system, which always needs domain related knowledge. A profile learner analyzes and constructs users' profiles of interests by collecting users' historical behaviors. In addition, this component also relies on feedbacks of users. A filtering component evaluates the relevances of items to particular users by matching them with users' profiles and the outputs can be either binary or continuous. In this stage, some similarity measurements including cosine or euclidean distance can usually be applied.\par
-\textbf{Flight Ticket Recommendation.} There is little work focusing on personalized flight  recommendations. Many online flight booking agencies provide sorting and filtering strategies to improve users' experiences, such as sorting by price or takeoff time and filtering by airline or departure city. Others also provide additional information that can help users, for example, placing the most popular flights at the top or highlighting some of them. These methods do make sense in helping users find appropriate flights within less time. However, they can not provide personalized recommendations. In 2004, Lorcan Coyle\cite{lor:flight} proposed a Personal Travel Assistant(PTA). PTA is based on case-based reasoning, which takes users' historical orders as cases and recommends the most similar candidate flights to users' queries. In addition, PTA also proposes the attribute weight training and case storage method.\par
-\textbf{Implicit Feedback.} The users' feedbacks can be divided into implicit or explicit type. The explicit feedbacks can be acquired from users' ratings or text comments. However,  users may not willing to provide explicit feedbacks since it needs additional efforts. Moreover, in many applications, a single numeric rating may not be adequate for describing users feeling to an item. Implicit feedback methods\cite{song:mining} try to infer users' attitudes to an item based on their behaviors, such as clicking, collecting or bookmarking et al. It has the advantage of being free from the problem of lacking feedback data. Nevertheless, implicit feedback based recommender suffers from problems of lack of negative feedbacks and data noises. In order to provide recommendations when only implicit feedbacks are available, some methods are proposed, such as one class collaborative filtering and content based recommender.\par
+\textbf{Content based Recommendation.} In online travel service industry such as airline tickets or hotel booking, the item (for example, an air ticket, a hotel booking order) information is usually highly structured, however, this information is quite mutable. Content-based recommender systems \cite{tech:cset}\cite{lops:handbook}are appropriate for highly structured items. The method needs proper representations of the attributes of items and the profile of user interests, then it tries to match the profile of user's interests with attributes of items.\par
+\textbf{Flight Ticket Recommendation.} There is little work focusing on personalized flight  recommendations. Many online flight booking agencies provide sorting and filtering strategies to improve users' experiences, such as sorting by price and filtering by airline etc. These methods do make sense in helping users find appropriate flights within less time. However, they can not provide personalized recommendations. Flight recommendation mainly bases on implicit feedback\cite{song:mining}, which suffers from problems of data noises and lack of negative feedbacks. In 2004, Lorcan Coyle\cite{lor:flight} proposed a Personal Travel Assistant(PTA). PTA is based on case-based reasoning, which takes users' historical orders as cases and recommends the most similar candidate flights to users' queries.\par
 
-
-\textbf{Probabilistic Topic Models.}  Topic models\cite{blei:lda}\cite{mic:atm}\cite{mark:prob} are proposed for automated extraction of useful semantic information from corpus data, which are widely used in information retrieval, document annotation, etc. The main step is extracting latent factors from the corpus, named topics, which are commonly probabilistic distributions over words. Topic models have three major advantages over other document modeling methods. At first, topic models provide a completely unsupervised approach to extract topics, thus requiring no document labels and no initialization. Unsupervised methods are necessary for modeling large document corpus, besides, in some fields, with the rapid change of content's topics, predefined topic categories may not reflect the development of specific field. Secondly, latent topics are interpretable respectively, so that extracted results are understandable for users. Finally, each document may consist of multiple topics and it can be considered as probabilistic distributions over topics. Many existing models regard documents as mixtures of topics, such as pLSI and LDA. The author-topic model is a generative model that extends LDA to include authorship information for document modeling. In our approach, the topic model is innovatively applied to identify users. \par
+\textbf{Probabilistic Topic Models.}  Topic models\cite{blei:lda}\cite{mic:atm}\cite{mark:prob} are proposed for automated extraction of useful semantic information from corpus data. The main step is extracting latent factors from the corpus, named topics, which are commonly probabilistic distributions over words. Topic models provide a completely unsupervised approach to extract topics, thus requiring no document labels and no initialization. Besides, each document may consist of multiple topics and it can be considered as probabilistic distributions over topics. The author-topic model is a generative model that extends LDA to include authorship information for document modeling. In our approach, the topic model is innovatively applied to identify users. \par
 
 \textbf{Shared Account Recommendation.} Some work aims at addressing the challenge of identifying users who share a single account. A top-$N$ recommendation for shared account  was proposed by Koen et al\cite{koen:top-n}. It is an item-based top-$N$ collaborative filtering recommender system on binary and positive-only feedbacks. Another method proposed by Santosh et al.\cite{kabbur:nlmf} models users in an account with a much richer representation. It uses a nonlinear matrix factorization methods for predicting the recommendation score. Yutaka et al.\cite{yutaka:modeling} introduced an approach for modeling multiple users' purchase in a single account using an extended pLSA model. All above methods are applied in scenario that users' personal information can't be acquired explicitly.
 
 \section{Passenger Prediction Model}
 \label{sec:mod}
-In this Section, we propose a generic model for predicting the probabilistic distribution of passengers, which can be used for recommendation.  Figure 2 shows an overview of the recommendation process. At first, a dataset of orders is saved into the database, in which each account may correspond to several passengers. We use this dataset to train the passenger prediction model as well as to extract passengers' preferences. Before a recommendation process starts, we calculate passenger distribution probability applying trained model and contextual information of current session. At the final step, we generate a ranked candidate list as the recommendation result based on passenger prediction and passengers' preference information.\par
+In this Section, we propose a generic model for predicting the probabilistic distribution of passengers, which can be used for recommendation.  Figure \ref{fig:over} shows an overview of the recommendation process. At first, a dataset of orders is saved into the database, in which each account may correspond to several passengers. We use this dataset to train the passenger prediction model as well as to extract passengers' preferences. Before a recommendation process starts, we calculate passenger distribution probability applying trained model and contextual information of current session. At the final step, we generate a ranked candidate list as the recommendation result based on passenger prediction and passengers' preference information.\par
 \begin{figure}[!hbt]
 \centering
 \includegraphics[scale=.40]{overview.eps}
@@ -76,8 +69,8 @@ In this Section, we propose a generic model for predicting the probabilistic dis
 
 \subsection{Model description and notation}
 Topic models are widely used in recommender systems. For example, in pLSA model\cite{tomas:coll}, a topic is a multinomial distribution over items and it represents a latent feature. An account is a multinomial distribution over topics and it can represent the preferences of an account. Each purchase can be regarded a sample that selects a topic $z$ from account $a$, and takes an item from topic $z$.\par
-When the topic model is applied to flight recommendation, there are some challenges. Firstly, the concepts behind flight tickets are quite difficult to be modeled. Conventional items only have static features, which means that the contents of an item are less likely to change in the future. For flight tickets, however, the price changes frequently even for the same flight number and class. Since the price factor plays a significant role in users' choice, so we can't consider the tickets with different prices as different items. Secondly, the amount of tickets for a flight is limited, which leads to a very sparse user-item matrix so that we can't use a collaborative-filtering like method directly.\par
-Fortunately, the decisive factors of a flight ticket are quite fixed, such as airline, takeoff time, price and class etc. Some factors are discrete while others are continuous. For continuous factors, we can partition them into discrete non-overlapping intervals. Thus, the number of discrete alternative values of each factor is also very limited. We take orders within each account as a corpus. Our notations are summarized in table \ref{tab:not}.\par
+When the topic model is applied to flight recommendation, there are some challenges. Firstly, the concepts behind flight tickets are quite difficult to be modeled. Conventional items only have static features, which means that the contents of an item are less likely to change in the future. For flight tickets, however, the price changes frequently even for the same flight number and class. Since the price factor plays a significant role in users' choice, so we can't consider the tickets with different prices as different items. Secondly, the amount of tickets for a flight is limited, which leads to a very sparse user-item matrix so that we can't use a collaborative-filtering like method directly. Fortunately, the decisive factors of a flight ticket are quite fixed, such as airline, takeoff time, price and class etc. The number of alternatives for each factor is also quite limited.\par
+Our notations are summarized in table \ref{tab:not}.\par
 \begin{table}[!htbp]
 \centering
 \caption{\label{tab:not}Notation}
@@ -93,9 +86,9 @@ $K$ & number of topics\\ \hline
 \end{tabular}
 \end{table}
 
-In author-topic model\cite{deiv:corpora}, a predefined vocabulary is generated containing discrete alternatives and intervals of all selected factors, we use integers to donate each entry in the vocabulary. The model discovers both topics distributed in an order and passengers associated with the distribution of topics. We treat every order as a bag of words, thus deduce each order to a vector of word counts. An order can be considered as a document with fixed word length, which can be represented as a vector of integers. All passengers corresponding to an order are co-authors for that document. Each passenger is associated with a multinomial distribution over topics and each topic is associated with a multinomial distribution over entries. The model essentially reduces dimensions of documents, depending on the amount of topics.\par
+In author-topic model\cite{deiv:corpora}, a predefined vocabulary is generated containing discrete alternatives and intervals of all selected factors. We treat every order as a bag of words, thus deduce each order to a vector of word counts. Each passenger is associated with a multinomial distribution over topics and each topic is associated with a multinomial distribution over entries.\par
 
-For an account $M$, we generate the observed passenger list $P$. We denote authors' distribution over topics by a $|P| \times K$ matrix $\Theta$. The multinomial distribution can be generated from Dirichlet prior distribution with hyper-parameter $\alpha$. Topics' distribution over words is denoted by a $K \times \sum_{i=1}^{|F|}|F_i| $  matrix $\Phi$, also, distribution can be generated with hyper-parameter $\beta$. Generally, these hyper-parameters needn't be estimated, here, we fix $\alpha$ and $\beta$ at 50/K and 0.01 respectively. \par
+For an account $M$, we generate the observed passenger list $P$. We denote passengers' distribution over topics by a $|P| \times K$ matrix $\Theta$. The multinomial distribution can be generated from Dirichlet prior distribution with hyper-parameter $\alpha$. Topics' distribution over words is denoted by a $K \times \sum_{i=1}^{|F|}|F_i| $  matrix $\Phi$, also, distribution can be generated with hyper-parameter $\beta$. Generally, these hyper-parameters needn't be estimated, here, we fix $\alpha$ and $\beta$ at 50/K and 0.01 respectively. \par
 
 To generate a word, we need draw two latent variables,  a passenger and a topic, respectively. First we draw a passenger uniformly from $P$,  a topic $Z$ from $\Theta_A$ and a word $w$ from $\Phi_Z$. The following process describes the generative model mathematically.\par
 
@@ -113,16 +106,9 @@ To generate a word, we need draw two latent variables,  a passenger and a topic,
               \end{enumerate}
        \end{enumerate}
 \end{enumerate}
-\begin{figure}[!hbt]
-\centering
-\includegraphics[scale=.55]{f1.eps}
-\caption{Probability Graph for the Author-Topic Model}
-\label{fig:mod}
-\end{figure}\par
-Figure \ref{fig:mod} shows the graphical model corresponding to this process, where shaded and non-shaded nodes represent observed and unobserved variables respectively. It's a plate notation, the number at the bottom of each box indicates repeated times of the operation. Arrows represents the conditional dependency between variables. In the author-topic model, observed variables include words in an order and the passengers of the order.
 
 \subsection{Parameter Inference}
-As mentioned above, the author-topic model includes two sets of unknown parameters, the $P$ passenger-topic distributions $\theta$ and the $K$ topic-word distributions $\phi$. There are a variety of algorithms that can be applied to estimate the parameters of author-topic models, the Expectation-Maximization algorithm and Gibbs sampling\cite{gregor:esti}. Generic EM algorithms are likely to face local maximum and computational inefficiency problems. Here we utilize Gibbs sampling because it does not explicitly estimate parameters, instead, it evaluates posteriori distribution just based on drawn passengers $X$ and topics $Z$. Thus it is simple for Dirichlet priors.\par
+As mentioned above, the author-topic model includes two sets of unknown parameters, the $P$ passenger-topic distributions $\theta$ and the $K$ topic-word distributions $\phi$. Generic EM algorithms are likely to face local maximum and computational inefficiency problems. Here we utilize Gibbs sampling\cite{gregor:esti} because it does not explicitly estimate parameters, instead, it evaluates posteriori distribution just based on drawn passengers $X$ and topics $Z$. Thus it is simple for Dirichlet priors.\par
 We can obtain the probability of every word $\mathbf{w}_o$ generated in each order, conditioned on $\Theta$ and $\Phi$ is:\\
 \begin{flalign}
 \begin{split}
@@ -153,7 +139,7 @@ Equation \ref{eq:2} represents the probability of assigning topic $t$ and passen
 \phi_{wt} = \frac{C_{wt}^{WT}+\beta}{\sum_{w'}C_{w't}^{WT}+W\beta}
 \end{equation}\\
 where $\theta_{tp}$ is the probability of drawing topic $t$ conditioned on passenger $p$ and $\phi_{wt}$ is the probability of drawing word $w$ conditioned on topic $t$. Thus in the process of parameter inference, we need to keep matrix $C^{TP}$ and $C^{WT}$, besides, the sampled word-topic list $T$ and sampled word-passenger list $P$ should be updated after each sampling, where $T[o][i]$ represents the topic sampled for word $i$ in order $o$ and $P[o][i]$ represents the passenger sampled.\par
-The algorithm performs in three steps, i.e., initialization, sampling and updating respectively. At the first step, we assign each word in the corpus with random passengers and topics. Then for every topic $t$, we count the frequency of each vocabulary item assigned with $t$. For every passenger $p$, we count the frequency of each $K$ topic assigned with $p$. For every sampling operation, a word in corpus is chosen, the probability of topic distribution and passenger distribution is calculated conditioned on the rest words in corpus by applying Equation \ref{eq:2}, with these two probabilities, we can sample a new topic and passenger for the current word. After several batch iterations, the passenger-topic matrix $\Theta$ and topic-word matrix $\Phi$ can be updated by applying Equation \ref{eq:3}, \ref{eq:4}. So the computational efficiency is the number of words multiplies number of topics, passengers and iteration times.\par
+The algorithm performs in three steps, i.e., initialization, sampling and updating respectively. At the first step, we assign each word in the corpus with random passengers and topics. For every sampling operation, a word in corpus is chosen, the probability of topic distribution and passenger distribution is calculated conditioned on the rest words in corpus by applying Equation \ref{eq:2}, with these two probabilities, we can sample a new topic and passenger for the current word. After several batch iterations, the passenger-topic matrix $\Theta$ and topic-word matrix $\Phi$ can be updated by applying Equation \ref{eq:3}, \ref{eq:4}. So the computational efficiency is the number of words multiplies number of topics, passengers and iteration times.\par
 \subsection{Passenger Prediction}
 Given the passenger topic probability matrix $\Theta$ and topic-word probability matrix $\Phi$. We can predict passengers for an anonymous order. It's essentially a classification of an unlabeled order\cite{shanshan:unpopular}. We perform the classification by choosing the passenger whose apperance can maximize the probability $p(p|o_n)$, represented in the following equation:\\
 \begin{equation}
@@ -161,9 +147,7 @@ Given the passenger topic probability matrix $\Theta$ and topic-word probability
 p(x=p|o_n,\Theta,\Phi) \propto p(p)\prod_{w \in o_n}\sum_t p(t|w)p(w|t,p)
 \end{equation}\\
 where $p(p) = |O_p| / |O|$, $|O_p|$ is the number of orders participated by passenger $p$. $p(w|t,p) = p(t|p) \times p(w|t)$ since the process of drawing topic from a passenger and drawing a word from a topic are independent of each other. $p(t|w)$ represents the probability that word $w$ is assigned to topic $t$, which can be computed by: $\frac{C^{wt}}{\sum_w'C^{w't}}$.\par
-One important issue here is how to determine the number of passengers. Through statistic analysis we find that most of testing orders have exactly one passenger. On average, the probability of every passenger is $P_A = \frac{1}{|P|}$. We determine the passenger number by omitting passengers whose probability is not greater than $P_A$. We show the evaluation metric and prediction result in Section 4.3.\par
 In conclusion, the passenger prediction task can be partitioned into two steps. For the first step, a set of decisive factors are extracted based on domain  knowledge to generate a vocabulary. And the parameter $\Theta$ and $\Phi$ are trained through several batches of Gibbs sampling. In the second step, passengers of an anonymous order can be predicted by applying Equation \ref{eq:5}. Algorithm \ref{alg:1} describes the predicting process mathematically.\par
-
 
 \begin{algorithm}[htb]
 \caption{passengerPrediction}
@@ -189,56 +173,20 @@ User's prediction list $Pl$
 \end{algorithmic} 
 \end{algorithm}
 
-\begin{algorithm}[htb]
-\caption{trainATM}
-\begin{algorithmic}[1]
-\label{alg:2}
-\REQUIRE
-Word vector $\overrightarrow{W}$. \par
-A test anonymous order $to$
-\ENSURE 
-User-topic parameter $\Theta$ \par
-Topic-word parameter $\Phi$
-\STATE $nak , nkv, nak\_sum, nkv\_sum \leftarrow \mathbf{0}$
-\FORALL{List o : $\overrightarrow{W}$}
-\FORALL{Word w : o}
-\STATE pick a topic $t$ and a user $p$ Multinomial;
-\STATE user-topic count $nak[p][t] += 1$;
-\STATE user-topic sum $nak\_sum[p] += 1$;
-\STATE topic-word count $nkv[t][w] += 1$;
-\STATE topic-word sum $nkv\_sum[t] += 1$;
-\ENDFOR
-\ENDFOR
-\WHILE {not reach iteration limit}
-\FORALL{List o : $\overrightarrow{W}$}
-\FORALL{Word w : o}
-\STATE $nak[p][t] -= 1, nak\_sum[p] -= 1$;
-\STATE $nkv[t][w] -= 1, nkv\_sum[t] -= 1$;
-\STATE sample a new user $p'$ and topic $t'$ by Equation \ref{eq:2};
-\STATE $nak[p'][t'] += 1, nak\_sum[p'] += 1$;
-\STATE $nkv[t'][w] += 1, nkv\_sum[t'] += 1$;
-\ENDFOR
-\ENDFOR
-\ENDWHILE
-\STATE calculate $\Theta,\Phi$ by Equation \ref{eq:3} ,\ref{eq:4};
-\RETURN $\Theta,\Phi$;
-\end{algorithmic} 
-\end{algorithm}
-
 \section{The Preference-based recommendation approach}
 \label{sec:rec}
 There is little existing work aiming at providing flight recommendation. In this section, we propose a user preference-based recommendation approach. In Section \ref{sec:exp}, we evaluate this method against some ranking strategies, such as price rank etc, to demonstrate that this method has a better accuracy. Then, we will apply the passenger prediction results to improve recommendation accuracy further.
 
 \subsection{Factor selection and frequency statistic}
-A flight ticket contains a set of attributes such as price, takeoff time, craft size, etc. We should select some of them as the decisive factors. These attributes may be either discrete or continuous variables. We divide a continuous attribute into a vector of intervals, so any factor can be represented as a vector of finite alternatives. Then, we analyze user's submitted orders by counting the frequency of all alternatives for each factor. In a word, a user's preference model can be described as a union of vectors, a vector indicates one factor and an element within one vector represents the frequency of corresponding alternative which the user has chosen.\par
+A flight ticket contains a set of attributes. These attributes may be either discrete or continuous variables. We divide continuous attribute into a list of intervals, for example, takeoff time can be divided into morning, noon, afternoon, night etc. Thus, any factor can be represented by finite alternatives. Then, we count the distribution of alternatives from a user's historical orders to analyze user's preference on corresponding factor. In a word, the preference model can be described as a union of vectors, a vector indicates one factor and an element within one vector represents the frequency of corresponding alternative which the user has chosen.\par
 We can also represent a candidate flight ticket as a vector, where each element is the corresponding alternative of each factor. So, for every ticket in candidate list, we compare the vector with users' preference model and get a score for every factor based on the frequency. We can sum up score of every factor to get a total score for that item, and rank all candidates according to the total score. We can then generate a top-$N$ recommendation.\par
 \subsection{Weight of factors}
-Since users may care different factors, we introduce personalized weight vector for each user. The evaluation of this weight vector contains two steps, initializing and training. At the initializing step, we estimate how much a user focuses on a factor through the information entropy, as mentioned in \cite{yang:pers}. We believe that if a user focuses on a factor, his behavior will be more concentrated. The entropy $H$ is a measure to describe the uncertainty for discrete random variable $X$ and probability mass function $P(X)$. Here is the mathematical representation for entropy.\\
+Since users may care different factors, we introduce personalized weight vector for each user. We estimate how much a user focuses on a factor through the information entropy, as mentioned in \cite{yang:pers}. We believe that if a user focuses on a factor, his behavior will be more concentrated. The entropy $H$ is a measure to describe the uncertainty for discrete random variable $X$ and probability mass function $P(X)$. Here is the mathematical representation for entropy.\\
 \begin{equation}
 H(X)=E[-lnP(X)]= - \sum_{i-1}^n P(x_i)log_bP(X_i)
 \end{equation}\par
-The value $b$ is the base of logarithm, and is usually 2. The entropy of every factor can be calculated and initialized as the weight value after normalization. Considering that different factors have a variety quantity of alternatives and the user may concern different factors some time later, we update the weight vector once the user submits an order. For each submission, we have already produced a ranked list for recommendations, if the user doesn't choose an item (i.e, a ticket) from top-$N$ items, we consider this recommendation fails, so that the weight vector need be retrained to make the rank of selected item improved. The concept of weight training is mentioned in \cite{lor:flight}. By performing weight training for factors, we hope that the result of recommendation getting better in the future. The training procedure is quite straightforward. At first a learning rate should be set, such as $\alpha = 0.1$ . If the selected item has lower similarity for factor $f$ than items ranked before it, the weight value of this factor should be decreased. Otherwise, the weight value should be increased. To avoid the problem of over-fitting, we define a maximum number of iteration step. So the stop criteria is either $1)$ the rank of selected items can't be improved anymore or $2)$ the procedure reaches the iteration time limitation.\\
-The preference based recommendation algorithm is described as Algorithm \ref{alg:3}. First extracting a user's preference  $P$ and initializing weighted list $W$ through entropy. Items in candidate list are ranked based on inner product of $W$ and corresponding value of factor. After every recommendation, the list is retrained and stored depending on the item that user actually chosen.
+The value $b$ is the base of logarithm, and is usually 2. The entropy of every factor can be calculated and initialized as the weight value after normalization. \par
+The preference based recommendation algorithm is described as Algorithm \ref{alg:3}. First extracting a user's preference  $P$ and initializing weighted list $W$ through entropy. Items in candidate list are ranked based on inner product of $W$ and corresponding value of factor.
 
 \begin{algorithm}[htb]
 \caption{Preference-Based-Recommendation}
@@ -251,92 +199,13 @@ Candidate item list $C$
 \ENSURE Ranked candidate list $R$
 \STATE Define a factor list $F$;
 \STATE $P \leftarrow extractUserPref(O,F)$;
-\STATE $W \leftarrow fetchWeightedList(u)$;
-\IF{$W$ is $null$}
 \STATE initialize $W$ by entropy;
-\ENDIF
 \STATE $R \leftarrow \emptyset$;
 \FORALL { $c : C$} 
 \STATE append $(c,weightedScore(c,W))$ to R;
 \ENDFOR 
 \STATE sort $R$ by score;
-\STATE $trainWeightedList(W,R,P)$;
-\STATE $saveWeightedList(u,W)$;
 \RETURN $R$;
-\end{algorithmic} 
-\end{algorithm}
-
-
-
-\begin{algorithm}[htb]
-\caption{extractUserPref}
-\begin{algorithmic}[1]
-\label{alg:4}
-\REQUIRE
-User's history order list $O$. \par
-Predefined discrete factor list $F$
-\ENSURE 
-User's preference list $P$
-\STATE List $P \leftarrow \emptyset$;
-\FORALL {List $f : F$} 
-\STATE append  $List(0,|f|)$  to $P$;
-\ENDFOR
-\FORALL{List $order : O$}
-\FOR{$i: 1 \to |order| $}
-\STATE $P[i][order_i] += 1$;
-\ENDFOR	
-\ENDFOR 
-\RETURN $P$;
-\end{algorithmic} 
-\end{algorithm}
-
-\begin{algorithm}[htb]
-\caption{weightedScore}
-\begin{algorithmic}[1]
-\label{alg:5}
-\REQUIRE \par
-Candidate item $c$ \par
-User's preference list $P$ \par
-User's weight vector $W$ 
-\ENSURE Score of candidate $S$
-\STATE $S \leftarrow 0$;
-\FOR{$i: 1 \to |c| $}
-\STATE $S += \frac{P[i][c_i]}{sum(P[i])} \times W[i]$;
-\ENDFOR
-\RETURN $S$;
-\end{algorithmic} 
-\end{algorithm}
-
-\begin{algorithm}[htb]
-\caption{trainWeightedList}
-\begin{algorithmic}[1]
-\label{alg:6}
-\REQUIRE \par
-Ranked list $R$ \par
-User's Preference list $P$ \par
-User's weight list $W$ \par
-User actually chose candidate $c$
-\ENSURE Trained weighted list $W$
-\STATE $R_c \leftarrow rankOf(R,c)$;
-\STATE $\alpha \leftarrow 0.1$;
-\STATE $count \leftarrow 0$;
-\WHILE {$count < limit$}
-\STATE $BeatList \leftarrow List(false,|W|)$;
-\FOR{$i: 1 \to |W|$}
-\FOR{$j: 1 \to R_c $}
-\IF{$P[i][R_{ji}] > P[i][c_{i}] $}
-\STATE $Beatlist[i] \leftarrow true$;
-\STATE break;
-\ENDIF
-\ENDFOR
-\IF{$BeatList[i] = true$}
-\STATE $BeatList[i] \leftarrow false$;
-\STATE $W[i] \leftarrow W[i] / (1+\alpha)$;
-\ENDIF
-\ENDFOR
-\ENDWHILE
-\STATE $normalize(W)$;
-\RETURN $S$;
 \end{algorithmic} 
 \end{algorithm}
 
@@ -345,7 +214,7 @@ User actually chose candidate $c$
 \label{sec:exp}
 In the following subsections, we introduce datasets and evaluation metrics. Then we evaluate the performance of passenger prediction and passenger prediction based recommendation respectively.
 \subsection{Dataset}
-In our experiments, we use a real flight ticket dataset, consisting of all submitted orders for two years. An order contains account id and all passengers' id. We use desensitized passenger id to distinguish individuals from each other. Besides, an order contains some travel information that can be considered as decisive factors, such as departure airport, arrival airport, takeoff time, etc. In our experiment, we select active users whose amount of historical orders reaches a threshold, thus passengers' preferences can be extracted with more confidence. In addition, many researches\cite{amy:guess}\cite{yutaka:modeling} on shared account recommendation generate an artificial dataset by composing single accounts' data. We also generate an artificial dataset combining single passengers' data from different accounts. The overviews of these two datasets and the meta data of orders are summarized in table \ref{tab:dat} and table \ref{tab:mdat}.
+In our experiments, we use a real flight ticket dataset, consisting of all submitted orders for two years. An order contains account id and all passengers' id. We use desensitized passenger id to distinguish individuals from each other. In our experiment, we select active users whose amount of historical orders reaches a threshold, thus passengers' preferences can be extracted with more confidence. In addition, many researches\cite{amy:guess}\cite{yutaka:modeling} on shared account recommendation generate an artificial dataset by composing single accounts' data. We also generate an artificial dataset combining single passengers' data from two different accounts. The overviews of these two datasets and the meta data of orders are summarized in table \ref{tab:dat} and table \ref{tab:mdat}.
 \begin{table}[!htbp]
 \centering
 \caption{\label{tab:dat}Datasets}
@@ -367,11 +236,9 @@ Order Info & \tabincell{c}{flight number, price , craft type, \\class, reschedul
 \end{tabular}
 \end{table}
 
-The meta data of an order includes travel information, context information, individual information and order information. Travel information contains the departure and arrival city, takeoff time. Context information contains time of browsing, searching and filtering actions. Individual information contains account id, personal information. Order information consists of price, seat class, flight number, airline company  et al.\par
-
 \subsection{Settings and Evaluation Metrics}
-Essentially, flight  recommendation is a process to select the best matched ticket by measuring the similarities between candidate tickets and user's preferences. We take the latest order of a user as the test data and the rest ones as the training data. The test data also plays a role of providing contextual information for user prediction.\par
-One significant issue is that we can't know real candidates at the time when a user performs the search action. Fortunately, we can get an approximate set of candidates by collecting orders from all users in the dataset with the same order date, takeoff date, departure city and arrival city as the test order, the granularity of the simulate candidate is to every flight, class and price range. Price level is a discrete interval representing the scale of the price based on domain knowledge. In order to get a convincing evaluation result, we filter out test orders with the size of candidate list less than 20 and the average size of candidates is 45.\par
+We take the latest order of a user as the test data and the rest ones as the training data. The test data also plays a role of providing contextual information for user prediction.\par
+One significant issue is that we can't know real candidates at the time when a user performs the search action. Fortunately, we can get an approximate set of candidates by collecting orders from all users in the dataset with the same order date, takeoff date, departure city and arrival city as the test order. In order to get a convincing evaluation result, we filter out test orders with the size of candidate list less than 20 and the average size of candidates is 45.\par
 We apply two commonly used metrics MAP(Mean Average Precision) and top-$N$ hit rate to evaluate the recommendation performance. The definition of MAP is described as follow:\\
 \begin{equation}
 MAP = \frac{\sum_{i=1}^{|M|}Acc(u_i)}{|M|}
@@ -398,7 +265,8 @@ Acc(u_i) = \frac{P' \cap A}{\sqrt{|P'| \times |A|}}
 Since we treat every account as a corpus, so a probabilistic distribution list is generated for all passengers contained in the account. At the first stage, we need to decide the passenger number for each test order. Assuming that there are total $|P|$ passengers in an account. So in average case, the probability of every passenger is $P_A = \frac{1}{|P|}$. We decide the passenger number by omitting passengers whose probability is not greater than $P_A$. We denote predicted passenger list as $P'$, actual passenger list as $A$. Thus we can get the prediction accuracy by Equation \ref{eq:10}. The numerator is the number of hit passengers, the denominator is penalty item for the size of predicted passenger list and predicted passenger list.
 
 \subsection{Passenger Prediction}
-We train a probabilistic model for every account where topic number selected varying ${5,10,\dots,50}$. We pick a test order for each account as a new document, then predict every passenger's probability of placing this order by Equation \ref{eq:5}. According to above evaluating metrics, the mean prediction accuracy rate of (a) real dataset and (b) artificial dataset is shown in Figure \ref{fig:pred}. The left sub-figure is the evaluation result on the real dataset and the right one is on the artificial dataset. The figure's horizontal axis shows the number of trained topics and the vertical axis shows the prediction accuracy computed by applying above mentioned metrics. The Random method means assigning random probabilities to passengers, we also record $10$ batch of random results as our approach does. For the artificial dataset, there are two passengers in every account and one passenger for every test order, so the accuracy of prediction is either 1.0 or 0. The results demonstrate that our model has a higher prediction precision than the random method on both datasets. We notice that the average improvements of prediction accuracy on artificial dataset are higher than on the real dataset. Besides, when the topic number is 10 or 15, both datasets get the best performance while the performance goes down with the topic number increasing. The sizes of corpus' vocabulary and number of words in each order also impact the optimal topic number. In the next subsection, we evaluate the recommendation performance with topic number fixed at 10.\par 
+\label{sub:pred}
+We train a probabilistic model for every account where topic number selected varying ${5,10,\dots,50}$. We pick a test order for each account as a new document, then predict every passenger's probability of placing this order by Equation \ref{eq:5}. According to above evaluating metrics, the mean prediction accuracy rate of (a) real dataset and (b) artificial dataset is shown in Figure \ref{fig:pred}. The left sub-figure is the evaluation result on the real dataset and the right one is on the artificial dataset. The figure's horizontal axis shows the number of trained topics and the vertical axis shows the prediction accuracy computed by applying above mentioned metrics. The Random method means assigning random probabilities to passengers, we also record $10$ batch of random results as our approach does. For the artificial dataset, there are two passengers in every account and one passenger for every test order, so the accuracy of prediction is either 1.0 or 0. The results demonstrate that our model has a higher prediction precision than the random method on both datasets. Besides, when the topic number is 10 or 15, both datasets get the best performance while the performance goes down with the topic number increasing, which demonstrates that the size of corpus' vocabulary and number of words in each order also impact the optimal topic number. In the next subsection, we evaluate the recommendation performance with topic number fixed at 10.\par 
 
 \begin{figure}[!h]
               \begin{minipage}[t]{0.47\linewidth}
@@ -419,8 +287,8 @@ We train a probabilistic model for every account where topic number selected var
 
 
 \subsection{Recommendation}
-After obtaining the predicted probabilistic distribution of passengers, we can extend preference based recommendation approach by  extracting preferences of predicted passengers. If there are multiple predicted passengers for one test order, we generate a composite preference model that combines all involved passenger's preferences together. \par
-We use MAP and top-$N$ hit rate mentioned above to evaluate recommendation performance. We compare different recommendation approaches including preference based recommendation(shorted as Pre), transfered preference based recommendation(tfPre), price rank(pRank), hot rank(hRank) and predicting preference based recommendation(pdPre). The transfered preference based method is the same as the previous one except it takes the difference between flight distribution of various air routes into consideration. This method groups training data by route, and evaluates similarity between routes by flight distribution on some attributes such as airline, class and price level. If a passenger isn't active on the target route, we transfer his preferences from most similar active routes with a transfer rate. In our experiment, the transfer rate is  $ \alpha = 0.5$. Price rank is a simple strategy that ranks candidates based on price in an ascending order. Hot rank is a strategy that ranks candidates according to the popularities, which is based on the total order amount within a period of the previous two weeks. \par
+After obtaining the predicted probabilistic distribution of passengers, we can extend preference based recommendation approach by extracting preferences of predicted passengers. If there are multiple predicted passengers for one test order, we generate a composite preference model that combines all involved passenger's preferences together. \par
+We use MAP and top-$N$ hit rate mentioned above to evaluate recommendation performance. We compare different recommendation approaches including preference based recommendation(shorted as Pre), transfered preference based recommendation(tfPre), price rank(pRank), hot rank(hRank) and predicting preference based recommendation(pdPre). The transfered preference based method is the same as the previous one except it takes the difference between flight distribution of various air routes into consideration. This method groups training data by route, and evaluates similarity between routes by flight distribution on some attributes such as airline, class and price level. If a passenger isn't active on the target route, we transfer his preferences from most similar active routes with a transfer rate. In our experiment, the transfer rate is  $ \alpha = 0.5$. Price rank is a simple strategy that ranks candidates based on price in an ascending order. Hot rank is a strategy that ranks candidates according to the popularities, which is based on total order amount within a period of previous two weeks. \par
 
 \begin{figure}[!h]
               \begin{minipage}[t]{0.47\linewidth}
@@ -454,13 +322,12 @@ We use MAP and top-$N$ hit rate mentioned above to evaluate recommendation perfo
               \caption{MAP of recommendation}
           \label{fig:rank}
 \end{figure}\par
-Figure \ref{fig:top} and \ref{fig:rank} show recommendation accuracy on the real dataset and artificial dataset respectively. The figure's horizontal axis shows the number of top-$N$ recommended flights. The accuracy increases linearly with the growth of recommended flights. The result shows that the baseline recommendation approach performs much better than price rank strategy. And content based recommendation combined with passenger prediction can achieve a higher accuracy than baseline method. We can also notice that the improvements on the artificial dataset is larger than on the real dataset. The reason may be that passengers in artificial dataset have more diversified preferences since they are randomly selected and composed.
+Figure \ref{fig:top} shows recommendation accuracy on the real dataset and artificial dataset respectively. The figure's horizontal axis shows the number of top-$N$ recommended flights. The accuracy increases linearly with the growth of recommended flights. Figure \ref{fig:rank} shows MAP on two datasets. The results show that the baseline recommendation approach performs much better than price rank strategy. And content based recommendation combined with passenger prediction can achieve a higher accuracy than baseline method. We can also notice that the improvements on the artificial dataset is larger than on the real dataset. The reason may be that passengers in artificial dataset have more diversified preferences since they are randomly selected and composed.
 
 \section{Conclusion and future work}
 \label{sec:con}
 In this paper, we proposed a generic probabilistic model to predict passengers in a single flight booking account based on passengers' historical submitted orders. This model is appropriate for scenarios that individuals can not be explicitly identified before placing the order, such as online hotel booking. For specified contextual environment, we can make a prediction for passenger distribution. Then we integrate passenger prediction into recommendation process. For experiment evaluation, we propose a general preference based recommendation approach for implicit feedback, and verify the efficiency of proposed model on two datasets. The results suggest that both passenger prediction and recommendation approach achieve a higher accuracy. \par
 In future work, we plan to do more research on how to determine the optimal amount of users in each session. 
-
 
 \begin{thebibliography}{1}
 \bibitem {koen:top-n}
@@ -541,7 +408,7 @@ Hangzhou Normal University,2012
 \bibitem {tomas:coll}
 Thomas,H.:
 Collaborative filtering via gaussian probabilistic latent semantic analysis.
-In: Proceedings of the 26th International ACM conference on Research and development in informaion retrieval,259-266(2004)
+In: Proceedings of the 26th International ACM conference on Research and development in information retrieval,259-266(2004)
 
 \bibitem {lor:flight}
 Lorcan,C.:
